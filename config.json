@@ -1,0 +1,12 @@
+{
+  "error_correction": "H",
+  "box_size": 12,
+  "border": 4,
+  "fill_color": "#222222",
+  "back_color": "white",
+  "logo_percent": 22,
+  "logo_padding": 1,
+  "show_password_by_default": true,
+  "default_output_dir": "E:\\Project scripts\\QR Code Generator\\assets\\qrcodes",
+  "default_logo_path": "E:\\scripts\\assets\\WiFi-No_background.png"
+}
