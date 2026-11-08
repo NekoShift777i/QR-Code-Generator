@@ -1,0 +1,14 @@
+# Виртуальное окружение
+venv
+venv/
+.venv
+.venv/
+.env
+
+# PyInstaller
+dist/
+build/
+*.spec
+
+# Прочие
+archive/
