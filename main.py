@@ -2,14 +2,9 @@ import os
 
 from config import (
     DATA_DIR,
-    DEFAULT_SETTINGS,
     OUTPUT_DIR,
-    PRESETS,
-    SCRIPT_DIR,
-    apply_preset,
     ensure_data_dirs,
     load_settings,
-    save_settings,
 )
 
 from logos import logos_menu
@@ -98,37 +93,6 @@ def resolve_output_path(settings: dict, filename: str) -> str:
 # МЕНЮ НАСТРОЕК
 # =========================================================
 
-def presets_menu(settings: dict) -> None:
-    while True:
-        clear()
-        print("=== Пресеты QR ===\n")
-        
-        preset_names = list(PRESETS.keys())
-    
-        for i, preset_name in enumerate(preset_names, start=1):
-            print(f"{i}. {preset_name}")
-        
-        print("\n0. Назад\n")
-        
-        choice = input("Выбор: ").strip()
-        
-        if choice == "0":
-            break
-        
-        if choice.isdigit():
-            idx = int(choice)
-            
-            if 1 <= idx <= len(preset_names):
-                preset_name = preset_names[idx - 1]
-                apply_preset(settings, preset_name)
-                
-                print(f"\nПрименён пресет: {preset_name}")
-                pause()
-                continue
-            
-            print("\nНеверный выбор")
-            pause()
-
 
 
 # =========================================================
@@ -158,7 +122,7 @@ def main() -> None:
         elif choice == "3":
             logos_menu(clear, pause)
         elif choice == "4":
-            settings_menu(settings, clear, pause, ask_yes_no, normalize_path, presets_menu)
+            settings_menu(settings, clear, pause, ask_yes_no, normalize_path)
         elif choice == "0":
             print("\nВыход.")
             break

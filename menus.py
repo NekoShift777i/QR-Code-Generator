@@ -1,6 +1,6 @@
 from typing import Callable
 
-from config import DEFAULT_SETTINGS, save_settings
+from config import DEFAULT_SETTINGS, PRESETS, apply_preset, save_settings
 
 from logos import choose_logo_file
 from qr_generator import generate_qr_card
@@ -155,7 +155,6 @@ def settings_menu(
     pause: Callable[[], None],
     ask_yes_no: Callable[..., bool],
     normalize_path: Callable[[str], str],
-    presets_menu: Callable[[dict], None],
 ) -> None:
     while True:
         clear()
@@ -241,7 +240,7 @@ def settings_menu(
             save_settings(settings)
         
         elif choice == "10":
-            presets_menu(settings)
+            presets_menu(settings, clear, pause)
 
         elif choice == "11":
             settings.clear()
@@ -252,3 +251,35 @@ def settings_menu(
 
         elif choice == "0":
             break
+
+
+def presets_menu(settings: dict, clear: Callable[[], None], pause: Callable[[], None]) -> None:
+    while True:
+        clear()
+        print("=== Пресеты QR ===\n")
+        
+        preset_names = list(PRESETS.keys())
+    
+        for i, preset_name in enumerate(preset_names, start=1):
+            print(f"{i}. {preset_name}")
+        
+        print("\n0. Назад\n")
+        
+        choice = input("Выбор: ").strip()
+        
+        if choice == "0":
+            break
+        
+        if choice.isdigit():
+            idx = int(choice)
+            
+            if 1 <= idx <= len(preset_names):
+                preset_name = preset_names[idx - 1]
+                apply_preset(settings, preset_name)
+                
+                print(f"\nПрименён пресет: {preset_name}")
+                pause()
+                continue
+            
+            print("\nНеверный выбор")
+            pause()
