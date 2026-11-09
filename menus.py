@@ -1,5 +1,7 @@
 from typing import Callable
 
+from config import DEFAULT_SETTINGS, save_settings
+
 from logos import choose_logo_file
 from qr_generator import generate_qr_card
 from wifi import build_wifi_string
@@ -145,3 +147,108 @@ def wifi_qr_menu(
         print(f"\n[!] Ошибка при генерации Wi-Fi QR: {e}")
 
     pause()
+
+
+def settings_menu(
+    settings: dict,
+    clear: Callable[[], None],
+    pause: Callable[[], None],
+    ask_yes_no: Callable[..., bool],
+    normalize_path: Callable[[str], str],
+    presets_menu: Callable[[dict], None],
+) -> None:
+    while True:
+        clear()
+        print("=== Настройки QR ===\n")
+        print(f"1. Уровень коррекции ошибок: {settings['error_correction']}")
+        print(f"2. Размер элемента (box_size): {settings['box_size']}")
+        print(f"3. Защитное поле (border): {settings['border']}")
+        print(f"4. Цвет элементов: {settings['fill_color']}")
+        print(f"5. Цвет фона: {settings['back_color']}")
+        print(f"6. Размер логотипа (%): {settings['logo_percent']}")
+        print(f"7. Поля логотипа (px): {settings['logo_padding']}")
+        print(f"8. Показывать пароль по умолчанию: {settings['show_password_by_default']}")
+        print(f"9. Папка сохранения: {settings['default_output_dir'] or '(data/output)'}")
+        print(f"10. Пресеты")
+        print("11. Сбросить настройки по умолчанию")
+        print("-----------------------------------")
+        print("0. Назад\n")
+
+        choice = input("Выбор: ").strip()
+
+        if choice == "1":
+            value = input("Введите L / M / Q / H: ").strip().upper()
+            if value in {"L", "M", "Q", "H"}:
+                settings["error_correction"] = value
+                save_settings(settings)
+
+        elif choice == "2":
+            value = input("Размер элемента (1-60): ").strip()
+            if value.isdigit():
+                n = int(value)
+                if 1 <= n <= 60:
+                    settings["box_size"] = n
+                    save_settings(settings)
+
+        elif choice == "3":
+            value = input("Размер защитного поля (0-10): ").strip()
+            if value.isdigit():
+                n = int(value)
+                if 0 <= n <= 10:
+                    settings["border"] = n
+                    save_settings(settings)
+
+        elif choice == "4":
+            value = input("Цвет элементов (например black или #222222): ").strip()
+            if value:
+                settings["fill_color"] = value
+                save_settings(settings)
+
+        elif choice == "5":
+            value = input("Цвет фона (например white или #ffffff): ").strip()
+            if value:
+                settings["back_color"] = value
+                save_settings(settings)
+
+        elif choice == "6":
+            value = input("Размер логотипа в % (5-25): ").strip()
+            if value.isdigit():
+                n = int(value)
+                if 5 <= n <= 25:
+                    settings["logo_percent"] = n
+                    save_settings(settings)
+
+        elif choice == "7":
+            value = input("Поля логотипа в px (1-50): ").strip()
+            if value.isdigit():
+                n = int(value)
+                if 1 <= n <= 50:
+                    settings["logo_padding"] = n
+                    save_settings(settings)
+
+        elif choice == "8":
+            settings["show_password_by_default"] = ask_yes_no(
+                "Показывать пароль по умолчанию?",
+                default=settings["show_password_by_default"]
+            )
+            save_settings(settings)
+
+        elif choice == "9":
+            value = normalize_path(
+                input("Папка сохранения (пусто = data/output): ")
+            )
+            settings["default_output_dir"] = value
+            save_settings(settings)
+        
+        elif choice == "10":
+            presets_menu(settings)
+
+        elif choice == "11":
+            settings.clear()
+            settings.update(DEFAULT_SETTINGS.copy())
+            save_settings(settings)
+            print("\nНастройки сброшены.")
+            pause()
+
+        elif choice == "0":
+            break
