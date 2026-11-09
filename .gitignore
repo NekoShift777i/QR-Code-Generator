@@ -4,6 +4,7 @@ venv/
 .venv
 .venv/
 .env
+__pycache__/
 
 # PyInstaller
 dist/
@@ -12,3 +13,4 @@ build/
 
 # Прочие
 archive/
+data/
