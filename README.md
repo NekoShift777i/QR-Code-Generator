@@ -71,6 +71,14 @@ python -m PyInstaller --noconfirm --clean --onefile --console --name "QR-Code-Ge
 
 Разработчик: **[NekoShift777i](https://github.com/NekoShift777i)**.
 
+## Лицензия
+
+Проект QR-Code-Generator распространяется на условиях **GNU General Public License версии 3.0 (GPLv3)**.
+
+Вы можете использовать, изучать, изменять и распространять программу в соответствии с условиями этой лицензии.
+
+Полный текст лицензии доступен в файле [LICENSE](LICENSE).
+
 ## Версия
 
 `1.2.4` — модульная структура программы и улучшенная проверка типа защиты Wi-Fi.
