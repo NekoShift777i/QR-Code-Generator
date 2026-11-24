@@ -5,25 +5,30 @@ from config import DEFAULT_SETTINGS, PRESETS, apply_preset, save_settings
 from logos import choose_logo_file
 from qr_generator import generate_qr_card
 from wifi import build_wifi_string
+from utils import InvalidOutputPathError
 
 
 def handle_output_error(
-    error: OSError,
+    error: OSError | InvalidOutputPathError,
     settings: dict,
     ask_yes_no: Callable[..., bool],
 ) -> bool:
     from utils import normalize_path, resolve_output_path
 
-    print("\n[!] Ошибка файловой системы.")
-    print(f"Причина: {error}")
-    print("Проверь доступность каталога сохранения и права на запись.")
+    if isinstance(error, InvalidOutputPathError):
+        print("\n[!] Некорректный путь сохранения.")
+        print(f"Причина: {error}")
+    else:
+        print("\n[!] Ошибка файловой системы.")
+        print(f"Причина: {error}")
+        print("Проверь доступность каталога сохранения и права на запись.")
 
     while ask_yes_no("Изменить папку сохранения?", default=False):
-        value = normalize_path(
-            input("Папка сохранения (пусто = data/output): ")
-        )
-
         try:
+            value = normalize_path(
+                input("Папка сохранения (пусто = data/output): ")
+            )
+
             resolve_output_path(
                 {"default_output_dir": value},
                 "test.png"
@@ -85,7 +90,7 @@ def text_qr_menu(
             print(f"\nГотово: {output_path}")
             break
 
-        except OSError as e:
+        except (OSError, InvalidOutputPathError) as e:
             if not handle_output_error(e, settings, ask_yes_no):
                 break
 
@@ -192,7 +197,7 @@ def wifi_qr_menu(
             print(f"\nГотово: {output_path}")
             break
 
-        except OSError as e:
+        except (OSError, InvalidOutputPathError) as e:
             if not handle_output_error(e, settings, ask_yes_no):
                 break
 
@@ -287,9 +292,16 @@ def settings_menu(
             save_settings(settings)
 
         elif choice == "9":
-            value = normalize_path(
-                input("Папка сохранения (пусто = data/output): ")
-            )
+            try:
+                value = normalize_path(
+                    input("Папка сохранения (пусто = data/output): ")
+                )
+            except ValueError as e:
+                print(f"\n[!] Некорректный путь: {e}")
+                print("Предыдущие настройки сохранены.")
+                pause()
+                continue
+
             settings["default_output_dir"] = value
             save_settings(settings)
         

@@ -1,8 +1,13 @@
 """Общие вспомогательные функции приложения."""
 
 import os
+import ntpath
 
 from config import OUTPUT_DIR
+
+
+class InvalidOutputPathError(ValueError):
+    """Неккоректный путь к каталогу сохранения"""
 
 
 def clear() -> None:
@@ -29,7 +34,23 @@ def normalize_path(path: str) -> str:
     if len(path) >= 2 and path[0] == path[-1] and path[0] in {'"', "'"}:
         path = path[1:-1]
 
-    return path.strip()
+    path = path.strip()
+
+    if not path:
+        return ""
+
+    if os.name == "nt":
+        drive, tail = ntpath.splitdrive(path)
+
+        if len(drive) == 2 and drive[1] == ":":
+            if not tail:
+                path = drive + "\\"
+            elif not tail.startswith(("\\", "/")):
+                raise InvalidOutputPathError(
+                    "Укажи абсолютный путь к каталогу, например D:\\QR."
+                )
+
+    return os.path.normpath(path)
 
 
 def sanitize_filename(name: str) -> str:
