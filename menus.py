@@ -7,6 +7,42 @@ from qr_generator import generate_qr_card
 from wifi import build_wifi_string
 
 
+def handle_output_error(
+    error: OSError,
+    settings: dict,
+    ask_yes_no: Callable[..., bool],
+) -> bool:
+    from utils import normalize_path, resolve_output_path
+
+    print("\n[!] Ошибка файловой системы.")
+    print(f"Причина: {error}")
+    print("Проверь доступность каталога сохранения и права на запись.")
+
+    while ask_yes_no("Изменить папку сохранения?", default=False):
+        value = normalize_path(
+            input("Папка сохранения (пусто = data/output): ")
+        )
+
+        try:
+            resolve_output_path(
+                {"default_output_dir": value},
+                "test.png"
+            )
+        except (OSError, ValueError) as e:
+            print(f"\n[!] Указанный каталог недоступен: {e}")
+            print("Предыдущие настройки сохранены.")
+            continue
+
+        settings["default_output_dir"] = value
+        save_settings(settings)
+
+        print("\nПапка сохранения изменена.")
+        print("Повторная попытка генерации QR-кода...")
+        return True
+
+    return False
+
+
 def text_qr_menu(
     settings: dict,
     clear: Callable[[], None],
@@ -33,20 +69,29 @@ def text_qr_menu(
     if not output_name.lower().endswith(".png"):
         output_name += ".png"
 
-    output_path = resolve_output_path(settings, output_name)
+    while True:
+        try:
+            output_path = resolve_output_path(settings, output_name)
 
-    try:
-        generate_qr_card(
-            data=text,
-            output_path=output_path,
-            settings=settings,
-            title=title,
-            subtitle_lines=[text],
-            logo_path=logo_path
-        )
-        print(f"\nГотово: {output_path}")
-    except Exception as e:
-        print(f"\n[!] Ошибка при генерации QR: {e}")
+            generate_qr_card(
+                data=text,
+                output_path=output_path,
+                settings=settings,
+                title=title,
+                subtitle_lines=[text],
+                logo_path=logo_path
+            )
+
+            print(f"\nГотово: {output_path}")
+            break
+
+        except OSError as e:
+            if not handle_output_error(e, settings, ask_yes_no):
+                break
+
+        except Exception as e:
+            print(f"\n[!] Ошибка при генерации QR: {e}")
+            break
 
     pause()
 
@@ -112,8 +157,6 @@ def wifi_qr_menu(
     if not output_name.lower().endswith(".png"):
         output_name += ".png"
 
-    output_path = resolve_output_path(settings, output_name)
-
     wifi_data = build_wifi_string(
         ssid=ssid,
         password=password,
@@ -133,18 +176,29 @@ def wifi_qr_menu(
     if hidden:
         subtitle_lines.append("Скрытая сеть: да")
 
-    try:
-        generate_qr_card(
-            data=wifi_data,
-            output_path=output_path,
-            settings=settings,
-            title=title,
-            subtitle_lines=subtitle_lines,
-            logo_path=logo_path
-        )
-        print(f"\nГотово: {output_path}")
-    except Exception as e:
-        print(f"\n[!] Ошибка при генерации Wi-Fi QR: {e}")
+    while True:
+        try:
+            output_path = resolve_output_path(settings, output_name)
+
+            generate_qr_card(
+                data=wifi_data,
+                output_path=output_path,
+                settings=settings,
+                title=title,
+                subtitle_lines=subtitle_lines,
+                logo_path=logo_path
+            )
+
+            print(f"\nГотово: {output_path}")
+            break
+
+        except OSError as e:
+            if not handle_output_error(e, settings, ask_yes_no):
+                break
+
+        except Exception as e:
+            print(f"\n[!] Ошибка при генерации Wi-Fi QR: {e}")
+            break
 
     pause()
 
