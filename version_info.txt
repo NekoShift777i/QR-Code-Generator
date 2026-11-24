@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 VSVersionInfo(
   ffi=FixedFileInfo(
-    filevers=(1, 2, 4, 0),
-    prodvers=(1, 2, 4, 0),
+    filevers=(1, 2, 5, 0),
+    prodvers=(1, 2, 5, 0),
     mask=0x3f,
     flags=0x0,
     OS=0x40004,
@@ -16,11 +16,11 @@ VSVersionInfo(
         StringStruct('CompanyName', 'NekoShift777i'),
         StringStruct('FileDescription', 'Генератор QR-кодов'),
         StringStruct('LegalCopyright', 'Copyright © 2026 NekoShift777i'),
-        StringStruct('FileVersion', '1.2.4.0'),
+        StringStruct('FileVersion', '1.2.5.0'),
         StringStruct('InternalName', 'QR-Code-Generator'),
         StringStruct('OriginalFilename', 'QR-Code-Generator.exe'),
         StringStruct('ProductName', 'Генератор QR-кодов'),
-        StringStruct('ProductVersion', '1.2.4'),
+        StringStruct('ProductVersion', '1.2.5'),
       ])
     ]),
     VarFileInfo([VarStruct('Translation', [1033, 1200])])
